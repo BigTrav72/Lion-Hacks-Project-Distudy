@@ -3,12 +3,24 @@
   "version": "1.0.0",
   "description": "An application that will focus on making quizzes from the lecture materials and score points based on how well the students did. The points will be used for the shop that will provide discounts for gift cards for services like GrubHub, Bookstore,, etc.",
   "main": "index.js",
+  
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
   },
+
   "repository": {
     "type": "git",
     "url": "git+https://github.com/BigTrav72/Lion-Hacks-Project-Distudy.git"
+  },
+  "dependencies": {
+    "next": "latest",
+    "react": "latest",
+    "react-dom": "latest",
+    "@mantine/core": "latest",
+    "@mantine/hooks": "latest"
   },
   "keywords": [],
   "author": "",

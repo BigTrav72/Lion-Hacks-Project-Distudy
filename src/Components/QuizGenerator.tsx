@@ -1,3 +1,5 @@
+'use client';
+
 import React, { useState } from 'react';
 import { 
   TextInput, 
@@ -7,26 +9,31 @@ import {
   Group, 
   Text, 
   Paper, 
-  rem 
+  rem,
+  Alert
 } from '@mantine/core';
-import { IconUpload, IconFileCheck, IconX } from '@tabler/icons-react';
+import { IconUpload, IconFileCheck, IconAlertCircle } from '@tabler/icons-react';
 
 export const QuizGenerator = () => {
   const [file, setFile] = useState<File | null>(null);
   const [text, setText] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSubmit = async () => {
-    if (!text) return alert("Please enter some lecture text first.");
+    if (!text) return setError("Please enter some lecture text first.");
     
     setLoading(true);
+    setError(null);
+
     const formData = new FormData();
     formData.append('text', text);
-    formData.append('user_id', 'demo_user_123'); // Auth ID
+    formData.append('user_id', 'demo_user_123'); 
     if (file) formData.append('image', file);
 
     try {
-      const res = await fetch('http://localhost:8000/api/generate-quiz', {
+      // Points to FastAPI via the rewrite in next.config.mjs
+      const res = await fetch('/api/generate-quiz', {
         method: 'POST',
         body: formData,
       });
@@ -35,48 +42,57 @@ export const QuizGenerator = () => {
         throw new Error("Daily quiz limit reached!");
       }
 
+      if (!res.ok) throw new Error("Server error occurred");
+
       const data = await res.json();
-      console.log("Quiz Generated:", data);
-      // Logic to transition to Quiz view goes here
+      console.log("Quiz Generated Successfully:", data);
+      alert("Quiz Generated! Check console for data.");
+      
     } catch (err: any) {
-      alert(err.message || "Server error occurred");
+      setError(err.message || "An unexpected error occurred");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <Paper shadow="xs" p="xl" withBorder style={{ maxWidth: 500, margin: 'auto' }}>
-      <Stack>
-        <Text size="lg" fw={700}>Create New Quiz</Text>
+    <Paper shadow="md" p="xl" withBorder style={{ maxWidth: 500, margin: '40px auto' }}>
+      <Stack gap="md">
+        <Text size="xl" fw={700} ta="center">Distudy AI Quiz</Text>
         
+        {error && (
+          <Alert variant="light" color="red" title="Error" icon={<IconAlertCircle />}>
+            {error}
+          </Alert>
+        )}
+
         <TextInput
           label="Lecture Topic or Content"
-          placeholder="Paste your lecture notes here..."
+          placeholder="Paste lecture notes or a summary..."
           value={text}
-          onChange={(e) => setText(e.currentTarget.value)}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => setText(e.currentTarget.value)}
           required
         />
 
-        {/* Mantine FileInput for Image Insertion */}
         <FileInput
           label="Add Image (Optional)"
-          placeholder="Upload lecture slide or diagram"
+          placeholder="Upload lecture slide"
           accept="image/png,image/jpeg"
           leftSection={<IconUpload style={{ width: rem(18), height: rem(18) }} />}
           value={file}
           onChange={setFile}
           clearable
-          description="Gemini will use this to generate visual questions"
+          description="Gemini will analyze the image for questions"
         />
 
         <Group justify="flex-end" mt="md">
           <Button 
             onClick={handleSubmit} 
             loading={loading}
+            fullWidth
             leftSection={!loading && <IconFileCheck size={18} />}
           >
-            {loading ? 'Generating...' : 'Generate Quiz'}
+            {loading ? 'Analyzing with Gemini...' : 'Generate Quiz'}
           </Button>
         </Group>
       </Stack>
