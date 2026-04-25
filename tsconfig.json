@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "jsx": "react-jsx", // This fixes the 'jsx-runtime' error
+    "module": "esnext",
+    "ignoreDeprecations": "6.0",
+    "moduleResolution": "node10",
+    "strict": true,
+    "skipLibCheck": true
+  }
+}
