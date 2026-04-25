@@ -20,7 +20,7 @@
 node_modules/
 .pnp
 .pnp.js
-
+node_
 # Next.js build output
 .next/
 out/
